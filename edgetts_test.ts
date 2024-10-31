@@ -51,7 +51,7 @@ Deno.test({
       try {
          const result = await tts.speak({ text: txt });
          console.log(result);
-         result.writeToFile("output.mp3");
+         result.writeToFile("text-tts.mp3");
          // Add assertions to verify the output
          assertExists(result);
       } finally {

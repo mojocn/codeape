@@ -18,10 +18,13 @@ interface AudioMetadata {
     Metadata: [WordBoundary];
 }
 
+
+//sentenceBoundaryEnabled = true is not supported in some countries
+
 const initialMessage = `
 Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n
 
-{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"webm-24khz-16bit-mono-opus"}}}}`;
+{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
 
 
 
@@ -51,7 +54,7 @@ interface TTSOptions {
      *
      * Defaults to `"audio-24khz-96kbitrate-mono-mp3"`
      */
-    outputFormat?: string;
+    // outputFormat?: string;
 
     /**
      * Indicates the speaking rate of the text.
