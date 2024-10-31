@@ -21,20 +21,7 @@ interface AudioMetadata {
 const initialMessage = `
 Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n
 
-{
-  "context": {
-    "synthesis": {
-      "audio": {
-        "metadataoptions": {
-          "sentenceBoundaryEnabled": "true",
-          "wordBoundaryEnabled": "true"
-        },
-        "outputFormat": "audio-24khz-96kbitrate-mono-mp3"
-      }
-    }
-  }
-}
-`;
+{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"webm-24khz-16bit-mono-opus"}}}}`;
 
 
 
@@ -99,17 +86,17 @@ function xmlStr(options: TTSOptions) {
     const volume = options.volume ?? "default";
     const requestId = globalThis.crypto.randomUUID();
     return `
-  X-RequestId:${requestId}\r\n
-  Content-Type:application/ssml+xml\r\n
-  Path:ssml\r\n\r\n
+X-RequestId:${requestId}\r\n
+Content-Type:application/ssml+xml\r\n
+Path:ssml\r\n\r\n
 
-  <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${language}">
-    <voice name="${voice}">
-      <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">
-        ${options.text}
-      </prosody>
-    </voice>
-  </speak>
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${language}">
+<voice name="${voice}">
+    <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">
+    ${options.text}
+    </prosody>
+</voice>
+</speak>
   `;
 }
 
@@ -144,7 +131,10 @@ export class EdgeTts {
     }
 
     connWebsocket(): Promise<WebSocket> {
-        const url = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${this.token}`;
+        const url = new URL(
+            `/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${this.token}`,
+            "wss://speech.platform.bing.com"
+        );
         const ws = new WebSocket(url);
         return new Promise<WebSocket>((resolve, reject) => {
             ws.addEventListener("open", () => {
