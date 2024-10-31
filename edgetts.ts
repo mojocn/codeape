@@ -9,7 +9,7 @@ interface WordBoundary {
         text: {
             Text: string;
             Length: number;
-            BoundaryType: "WordBoundary";
+            BoundaryType: "WordBoundary" | "SentenceBoundary";
         };
     };
 }
@@ -26,7 +26,7 @@ Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n
     "synthesis": {
       "audio": {
         "metadataoptions": {
-          "sentenceBoundaryEnabled": "false",
+          "sentenceBoundaryEnabled": "true",
           "wordBoundaryEnabled": "true"
         },
         "outputFormat": "audio-24khz-96kbitrate-mono-mp3"
@@ -140,10 +140,9 @@ export class EdgeTts {
         const url = `https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=${this.token}`;
         const response = await fetch(url);
         const voices: Array<Voice> = await response.json();
-        await response.body?.cancel();
         return voices;
     }
-    
+
     connWebsocket(): Promise<WebSocket> {
         const url = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${this.token}`;
         const ws = new WebSocket(url);
@@ -165,10 +164,12 @@ export class EdgeTts {
     async speak(options: TTSOptions): Promise<TtsResult> {
         const ws = await this.connWebsocket();
         this.websocket = ws;
-
+        const textXml = xmlStr(options);
+        ws.send(textXml);
         const result = new TtsResult();
         const promise = new Promise<TtsResult>((resolve) => {
             ws.addEventListener("message", async (message: MessageEvent<string | Blob>) => {
+
                 if (typeof message.data !== "string") {
                     const blob: Blob = message.data;
                     const separator = "Path:audio\r\n";
@@ -176,7 +177,10 @@ export class EdgeTts {
                     const index = text.indexOf(separator) + separator.length;
                     const audioBlob = blob.slice(index);
                     result.audioParts.push(audioBlob);
-                } else if (message.data.includes("Path:audio.metadata")) {
+                    return
+                }
+                console.log(message.data);
+                if (message.data.includes("Path:audio.metadata")) {
                     const parts = message.data.split("Path:audio.metadata")
                     if (parts.length >= 2) {
                         const meta = JSON.parse(parts[1]) as AudioMetadata;
@@ -184,13 +188,10 @@ export class EdgeTts {
                     }
                 } else if (message.data.includes("Path:turn.end")) {
                     return resolve(result);
-                } else {
-                    //console.log(message.data);
                 }
             });
         });
-        const textXml = xmlStr(options);
-        ws.send(textXml);
+
         return await promise;;
     }
 
