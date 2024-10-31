@@ -19,13 +19,6 @@ interface AudioMetadata {
 }
 
 
-//sentenceBoundaryEnabled = true is not supported in some countries
-
-const initialMessage = `
-Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n
-
-{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
-
 
 
 interface TTSOptions {
@@ -81,6 +74,7 @@ interface TTSOptions {
 
 }
 
+
 function xmlStr(options: TTSOptions) {
     const voice = options.voice ?? "en-US-AvaNeural";
     const language = options.language ?? "en-US";
@@ -90,6 +84,7 @@ function xmlStr(options: TTSOptions) {
     const requestId = globalThis.crypto.randomUUID();
     return `
 X-RequestId:${requestId}\r\n
+X-Timestamp:${new Date().toString()}Z\r\n
 Content-Type:application/ssml+xml\r\n
 Path:ssml\r\n\r\n
 
@@ -139,9 +134,21 @@ export class EdgeTts {
             "wss://speech.platform.bing.com"
         );
         const ws = new WebSocket(url);
+        //sentenceBoundaryEnabled = true is not supported in some countries
+
+        const initialMessage = `
+X-Timestamp:${new Date().toString()}\r\n
+Content-Type:application/json; charset=utf-8\r\n
+Path:speech.config\r\n\r\n
+
+{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
+        
+
         return new Promise<WebSocket>((resolve, reject) => {
             ws.addEventListener("open", () => {
                 ws.send(initialMessage);
+                console.info("---");
+                console.log(initialMessage);
                 resolve(ws);
             });
             ws.addEventListener("error", reject);
