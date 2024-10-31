@@ -135,6 +135,15 @@ export class EdgeTts {
     constructor(token?: string) {
         this.token = token ?? "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
     }
+
+    async voices(): Promise<Array<Voice>> {
+        const url = `https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=${this.token}`;
+        const response = await fetch(url);
+        const voices: Array<Voice> = await response.json();
+        await response.body?.cancel();
+        return voices;
+    }
+    
     connWebsocket(): Promise<WebSocket> {
         const url = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${this.token}`;
         const ws = new WebSocket(url);
@@ -153,14 +162,6 @@ export class EdgeTts {
         }
         this.websocket = undefined;
     }
-    async voices(): Promise<Array<Voice>> {
-        const url = `https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=${this.token}`;
-        const response = await fetch(url);
-        const voices: Array<Voice> = await response.json();
-        await response.body?.cancel();
-        return voices;
-    }
-
     async speak(options: TTSOptions): Promise<TtsResult> {
         const ws = await this.connWebsocket();
         this.websocket = ws;
@@ -202,7 +203,7 @@ class TtsResult {
         this.audioParts = [];
         this.marks = [];
     }
-    get mp3() {
+    get mp3Blob() {
         return new Blob(this.audioParts, { type: "audio/mpeg" });
     }
     async writeToFile(path?: string) {
