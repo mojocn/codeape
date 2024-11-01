@@ -18,9 +18,6 @@ interface AudioMetadata {
     Metadata: [WordBoundary];
 }
 
-
-
-
 interface TTSOptions {
     /** The text that will be generated as audio */
     text: string;
@@ -74,8 +71,24 @@ interface TTSOptions {
 
 }
 
+export interface VoiceTag {
+    ContentCategories: string[];
+    VoicePersonalities: string[];
+}
 
-function xmlStr(options: TTSOptions) {
+export interface Voice {
+    Name: string;
+    ShortName: string;
+    Gender: string;
+    Locale: string;
+    SuggestedCodec: string;
+    FriendlyName: string;
+    Status: string;
+    VoiceTag: VoiceTag;
+}
+
+
+function ssmlXmlStr(options: TTSOptions):string {
     const voice = options.voice ?? "en-US-AvaNeural";
     const language = options.language ?? "en-US";
     const rate = options.rate ?? "default";
@@ -98,20 +111,6 @@ Path:ssml\r\n\r\n
   `;
 }
 
-export interface VoiceTag {
-    ContentCategories: string[];
-    VoicePersonalities: string[];
-}
-export interface Voice {
-    Name: string;
-    ShortName: string;
-    Gender: string;
-    Locale: string;
-    SuggestedCodec: string;
-    FriendlyName: string;
-    Status: string;
-    VoiceTag: VoiceTag;
-}
 
 
 export class EdgeTts {
@@ -135,20 +134,16 @@ export class EdgeTts {
         );
         const ws = new WebSocket(url);
         //sentenceBoundaryEnabled = true is not supported in some countries
-
         const initialMessage = `
 X-Timestamp:${new Date().toString()}\r\n
 Content-Type:application/json; charset=utf-8\r\n
 Path:speech.config\r\n\r\n
-
 {"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
         
 
         return new Promise<WebSocket>((resolve, reject) => {
             ws.addEventListener("open", () => {
                 ws.send(initialMessage);
-                console.info("---");
-                console.log(initialMessage);
                 resolve(ws);
             });
             ws.addEventListener("error", reject);
@@ -164,12 +159,11 @@ Path:speech.config\r\n\r\n
     async speak(options: TTSOptions): Promise<TtsResult> {
         const ws = await this.connWebsocket();
         this.websocket = ws;
-        const textXml = xmlStr(options);
+        const textXml = ssmlXmlStr(options);
         ws.send(textXml);
         const result = new TtsResult();
         const promise = new Promise<TtsResult>((resolve) => {
             ws.addEventListener("message", async (message: MessageEvent<string | Blob>) => {
-
                 if (typeof message.data !== "string") {
                     const blob: Blob = message.data;
                     const separator = "Path:audio\r\n";
@@ -179,7 +173,6 @@ Path:speech.config\r\n\r\n
                     result.audioParts.push(audioBlob);
                     return
                 }
-                console.log(message.data);
                 if (message.data.includes("Path:audio.metadata")) {
                     const parts = message.data.split("Path:audio.metadata")
                     if (parts.length >= 2) {
@@ -191,7 +184,6 @@ Path:speech.config\r\n\r\n
                 }
             });
         });
-
         return await promise;;
     }
 
