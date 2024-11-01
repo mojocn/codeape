@@ -88,7 +88,7 @@ export interface Voice {
 }
 
 
-function ssmlXmlStr(options: TTSOptions):string {
+function ssmlStr(options: TTSOptions):string {
     const voice = options.voice ?? "en-US-AvaNeural";
     const language = options.language ?? "en-US";
     const rate = options.rate ?? "default";
@@ -100,7 +100,6 @@ X-RequestId:${requestId}\r\n
 X-Timestamp:${new Date().toString()}Z\r\n
 Content-Type:application/ssml+xml\r\n
 Path:ssml\r\n\r\n
-
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${language}">
 <voice name="${voice}">
     <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">
@@ -138,7 +137,7 @@ export class EdgeTts {
 X-Timestamp:${new Date().toString()}\r\n
 Content-Type:application/json; charset=utf-8\r\n
 Path:speech.config\r\n\r\n
-{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
+{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"true","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
         
 
         return new Promise<WebSocket>((resolve, reject) => {
@@ -159,7 +158,7 @@ Path:speech.config\r\n\r\n
     async speak(options: TTSOptions): Promise<TtsResult> {
         const ws = await this.connWebsocket();
         this.websocket = ws;
-        const textXml = ssmlXmlStr(options);
+        const textXml = ssmlStr(options);
         ws.send(textXml);
         const result = new TtsResult();
         const promise = new Promise<TtsResult>((resolve) => {

@@ -12,11 +12,15 @@ I won't share the step-by-step process for locating the internal text-to-speech 
 But I'd be happy to share the detailed logs of the Burp-suite from text-to-speech WebSocket.
 We can find the link to the text-to-speech WebSocket protocol documentation below.
 Let's go straight to the codebase and see how it really works.
+
+
 STEP 1:  Edge Text to Speech Voices
 Get a list of all the voices that are supported by Microsoft Edge's text-to-speech feature.
 The Voice List API looks like this.
-We can simply use the fetch function to get the JSON response.
+We can simply use the 'fetch' function to get the JSON response.
 This is what an available voices response looks like.
+
+
 STEP 2: Edge Text-to-Speech
 Let's start looking at how to turn text into speech.
 The text to speech uses WebSockets.
@@ -27,7 +31,7 @@ We cannot customize headers to create a WebSocket connection in Deno without usi
 If we can't customize the headers of a WebSocket connection, it may cause connection problems or even get blocked by Microsoft.
 After the WebSocket open event, We will respond with an initial message.
 This message contains information about what details the text-to-speech endpoint should return.
-Metadata options include things like the audio output format, timestamps for speaking words, and timestamps for speaking sentences.
+Metadata options include things like the audio output format, timestamps for speaking words, and timestamps for speaking sentences."
 At the same time, we need to listen for both the error and close events.
 Let's start with the speaking part of the codebase.
 We combine the text and speaking options, then send the message to the Websocket.
@@ -36,6 +40,8 @@ The text to speech result will be filled once the promise is completed successfu
 In the WebSocket message event listener, we deal with two types of data.
 The path audio separator is used for audio files.
 The path audio metadata separator is used to mark the time when word or sentence are spoken.
+
+
 STEP 3: Write Audio to File
 After everything is done, we can use the text to speech result to write a file or create a subtitle.
 We put the parts of the MP3 audio together.
@@ -43,8 +49,7 @@ Use the 'deno write sync' function to write the blob data into an MP3 file, maki
 Now we can easily turn our text into an audio file using the free text-to-speech.
 If you're interested in the codebase,
 You can find the link to the GitHub repository in the video below.
-If you enjoy watching this video, please show your appreciation by liking it and considering subscribing to my channel.
-`
+If you enjoy watching this video, please show your appreciation by liking it and considering subscribing to my channel.`
 
 Deno.test({
    name: "test edge TTS speak",
