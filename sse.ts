@@ -11,7 +11,7 @@ export interface Event {
     /**
      * The data associated with the event, which can be an ArrayBuffer or ArrayBufferLike.
      */
-    data: any;//string|boolean|number|object;
+    data: string | boolean | number | object;
 
     /**
      * An optional identifier for the event.
@@ -88,6 +88,11 @@ export class SSE {
         this.writer.write(chunk);
     }
 
+    /**
+     * Generates an HTTP response with the required headers for Server-Sent Events (SSE).
+     *
+     * @returns {Response} A new Response object with the readable stream and SSE headers.
+     */
     response(): Response {
         return new Response(this.readable, {
             headers: sseRequiredHeaders,

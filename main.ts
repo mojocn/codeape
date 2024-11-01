@@ -11,9 +11,8 @@ function handler(_req: Request) {
       return;
     }
     const ev: Event = {
-      id: counter,
       event: "message",
-      data: { a: 1 },
+      data: { counter: counter + 3 },
     };
     sse.write(ev);
     ev.data = "Hello, world!";
