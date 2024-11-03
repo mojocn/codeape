@@ -1,26 +1,35 @@
 import { SSE, Event } from "./sse.ts";
 
-function handler(_req: Request) {
+async function handler(_req: Request) {
   const sse = new SSE();
-  let counter = 0;
-  const interval = setInterval(() => {
-    counter++;
-    if (counter > 10) {
-      clearInterval(interval);
-      sse.close();//stop sending events
-      return;
-    }
-    const ev: Event = {
-      event: "message",
-      data: { counter: counter + 3 },
-    };
-    sse.write(ev);
-    ev.data = "Hello, world!";
-    sse.write(ev);
-  }, 250);
-  return sse.response();
-}
 
+  let timer: number | undefined = undefined;
+  const body = new ReadableStream<Event>({
+    start(controller) {
+      timer = setInterval(() => {
+        const message = `It is ${new Date().toISOString()}\n`;
+        if (!controller.desiredSize) return; // Check if the stream is still writable
+        controller.enqueue({ data: message });
+      }, 1000);
+      //stop timer in 10 seconds
+      setTimeout(() => {
+        clearInterval(timer);
+        if (!controller.desiredSize) return; // Check if the stream is still writable
+
+        controller.close();
+      }, 10000);
+    },
+    cancel() {
+      if (timer !== undefined) {
+        clearInterval(timer);
+      }
+    },
+  });
+
+
+  return sse.response(body);
+
+}
 
 
 Deno.serve(handler);

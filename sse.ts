@@ -6,7 +6,7 @@ export interface Event {
     /**
      * The type of the event.
      */
-    event: string;
+    event?: string;
 
     /**
      * The data associated with the event, which can be an ArrayBuffer or ArrayBufferLike.
@@ -34,15 +34,8 @@ export const sseRequiredHeaders = {
  * that can be read by a ReadableStream.
  */
 export class SSE {
-    /**
-     * The writer used to write Event objects to the TransformStream.
-     */
-    private writer: WritableStreamDefaultWriter<Event>;
+    trans: TransformStream<Event, Uint8Array>;
 
-    /**
-     * The readable stream that outputs Uint8Array chunks representing the SSE messages.
-     */
-    readable: ReadableStream<Uint8Array>;
 
     /**
      * Constructs a new SSE instance, initializing the TransformStream and its writer.
@@ -70,32 +63,23 @@ export class SSE {
                 controller.enqueue(message);
             }
         });
-        this.writer = trans.writable.getWriter();
-        this.readable = trans.readable;
+        this.trans = trans;
     };
 
-    /**
-     * Closes the writer, signaling that no more Event objects will be written.
-     */
-    close() {
-        this.writer.close();
-    }
-    /**
-     * Writes an Event object to the TransformStream.
-     * @param chunk - The Event object to be written.
-     */
-    write(chunk: Event) {
-        this.writer.write(chunk);
-    }
+
+
+
 
     /**
      * Generates an HTTP response with the required headers for Server-Sent Events (SSE).
      *
      * @returns {Response} A new Response object with the readable stream and SSE headers.
      */
-    response(): Response {
-        return new Response(this.readable, {
+    response(source: ReadableStream<Event>): Response {
+        const reader = source.pipeThrough(this.trans)
+        return new Response(reader, {
             headers: sseRequiredHeaders,
+            status: 200,
         });
     }
 }

@@ -1,5 +1,3 @@
-
-
 export const toMs = (duration: number) => Math.floor(duration / 10_000);
 interface WordBoundary {
     Type: "WordBoundary";
@@ -87,7 +85,6 @@ export interface Voice {
     VoiceTag: VoiceTag;
 }
 
-
 function ssmlStr(options: TTSOptions):string {
     const voice = options.voice ?? "en-US-AvaNeural";
     const language = options.language ?? "en-US";
@@ -95,12 +92,12 @@ function ssmlStr(options: TTSOptions):string {
     const pitch = options.pitch ?? "default";
     const volume = options.volume ?? "default";
     const requestId = globalThis.crypto.randomUUID();
-    return `
-X-RequestId:${requestId}\r\n
+    return `X-RequestId:${requestId}\r\n
 X-Timestamp:${new Date().toString()}Z\r\n
 Content-Type:application/ssml+xml\r\n
 Path:ssml\r\n\r\n
-<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${language}">
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" 
+xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${language}">
 <voice name="${voice}">
     <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">
     ${options.text}
@@ -109,8 +106,24 @@ Path:ssml\r\n\r\n
 </speak>
   `;
 }
-
-
+class TtsResult {
+    audioParts: Array<BlobPart>;
+    marks: Array<WordBoundary>;
+    constructor() {
+        this.audioParts = [];
+        this.marks = [];
+    }
+    get mp3Blob() {
+        return new Blob(this.audioParts, { type: "audio/mpeg" });
+    }
+    async writeToFile(path?: string) {
+        path = path ?? "output.mp3";
+        const blob = new Blob(this.audioParts);
+        const arrayBuffer = await blob.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        Deno.writeFileSync(path, uint8Array);
+    }
+}
 
 export class EdgeTts {
     websocket?: WebSocket;
@@ -137,7 +150,9 @@ export class EdgeTts {
 X-Timestamp:${new Date().toString()}\r\n
 Content-Type:application/json; charset=utf-8\r\n
 Path:speech.config\r\n\r\n
-{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"true","wordBoundaryEnabled":"true"},"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
+{"context":{"synthesis":{"audio":{"metadataoptions":
+{"sentenceBoundaryEnabled":"true","wordBoundaryEnabled":"true"},
+"outputFormat":"audio-24khz-96kbitrate-mono-mp3"}}}}`;
         
 
         return new Promise<WebSocket>((resolve, reject) => {
@@ -188,21 +203,3 @@ Path:speech.config\r\n\r\n
 
 };
 
-class TtsResult {
-    audioParts: Array<BlobPart>;
-    marks: Array<WordBoundary>;
-    constructor() {
-        this.audioParts = [];
-        this.marks = [];
-    }
-    get mp3Blob() {
-        return new Blob(this.audioParts, { type: "audio/mpeg" });
-    }
-    async writeToFile(path?: string) {
-        path = path ?? "output.mp3";
-        const blob = new Blob(this.audioParts);
-        const arrayBuffer = await blob.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        Deno.writeFileSync(path, uint8Array);
-    }
-}
