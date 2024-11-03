@@ -7,9 +7,9 @@
 
         {
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Start SSE Test Server",
             "type": "node",
-            "program": "${workspaceFolder}/main.ts",
+            "program": "${workspaceFolder}/sse_test.ts",
             "cwd": "${workspaceFolder}",
             "env": {},
             "runtimeExecutable": "deno.EXE",
