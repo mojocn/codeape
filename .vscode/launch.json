@@ -15,6 +15,7 @@
             "runtimeExecutable": "deno.EXE",
             "runtimeArgs": [
                 "run",
+                "--watch",
                 "--unstable",
                 "--inspect-wait",
                 "--allow-all"
