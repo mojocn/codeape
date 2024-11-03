@@ -1,9 +1,8 @@
 # Edge browser TTS detail analysis by BurpSuite
 
-
 ## WebSocket TTS
 
-``` request
+```request
 GET /consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&Sec-MS-GEC=742A95705C82BD7E81F8F441E7E6B8536232464A5A7CFFADBD86C8B18C68786F&Sec-MS-GEC-Version=1-130.0.2849.56&ConnectionId=4647ccab97526075bebfcaf936be21d6 HTTP/2
 Host: speech.platform.bing.com
 Connection: Upgrade
@@ -17,11 +16,9 @@ Accept-Encoding: gzip, deflate, br
 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
 Cookie: ***
 Sec-Websocket-Key: XjZLqoDV9/aHn815U9ruOw==
-
 ```
 
-
-```response 
+```response
 HTTP/1.1 101 Switching Protocols
 Upgrade: websocket
 Access-Control-Allow-Origin: *
@@ -32,11 +29,7 @@ Accept-CH: Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-
 X-MSEdge-Ref: Ref A: 2807ACF085154580BCC7D91F47A50A83 Ref B: TYBEDGE0406 Ref C: 2024-10-31T06:39:43Z
 Connection: Upgrade
 Date: Thu, 31 Oct 2024 06:39:43 GMT
-
-
-
 ```
-
 
 ### websocket send msg
 
@@ -48,7 +41,6 @@ Path:speech.config
 {"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},"outputFormat":"webm-24khz-16bit-mono-opus"}}}}
 ```
 
-
 ```
 X-RequestId:d6f2bbbe6a9817a6030a3d4833e967fd
 Content-Type:application/ssml+xml
@@ -57,7 +49,6 @@ Path:ssml
 
 <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis'  xml:lang='en-US'><voice name='Microsoft Server Speech Text to Speech Voice (en-HK, SamNeural)'><prosody pitch='+0Hz' rate ='+0%' volume='+0%'> Home | About Folklore | Quotes </prosody></voice></speak>
 ```
-
 
 ## Voice List Api
 
@@ -80,8 +71,6 @@ Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br
 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
 Priority: u=1, i
-
-
 ```
 
 ```
