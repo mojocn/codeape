@@ -1,40 +1,40 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "request": "launch",
-            "name": "ask cloudflare AI",
-            "type": "node",
-            "program": "${workspaceFolder}/ask_cf_ai.ts",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "runtimeExecutable": "deno.EXE",
-            "runtimeArgs": [
-                "run",
-                "--allow-all"
-            ],
-            "attachSimplePort": 9229
-        },
-        {
-            "request": "launch",
-            "name": "Start SSE Test Server",
-            "type": "node",
-            "program": "${workspaceFolder}/sse_test.ts",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "runtimeExecutable": "deno.EXE",
-            "runtimeArgs": [
-                "run",
-                "--watch",
-                "--unstable",
-                "--inspect-wait",
-                "--inspect-brk",
-                "--allow-all"
-            ],
-            "attachSimplePort": 9229
-        }
-    ]
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"request": "launch",
+			"name": "ask cloudflare AI",
+			"type": "node",
+			"program": "${workspaceFolder}/ask_cf_ai.ts",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"runtimeExecutable": "deno.EXE",
+			"runtimeArgs": [
+				"run",
+				"--allow-all"
+			],
+			"attachSimplePort": 9229
+		},
+		{
+			"request": "launch",
+			"name": "Start SSE Test Server",
+			"type": "node",
+			"program": "${workspaceFolder}/sse_test.ts",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"runtimeExecutable": "deno.EXE",
+			"runtimeArgs": [
+				"run",
+				"--watch",
+				"--unstable",
+				"--inspect-wait",
+				"--inspect-brk",
+				"--allow-all"
+			],
+			"attachSimplePort": 9229
+		}
+	]
 }
