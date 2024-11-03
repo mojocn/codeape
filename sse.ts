@@ -73,4 +73,10 @@ export class SSE {
 			status: 200,
 		});
 	}
+	responseRaw(source: ReadableStream): Response {
+		return new Response(source, {
+			headers: sseRequiredHeaders,
+			status: 200,
+		});
+	}
 }

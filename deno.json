@@ -23,6 +23,7 @@
 		"exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
 	},
 	"imports": {
-		"@std/assert": "jsr:@std/assert@1"
+		"@std/assert": "jsr:@std/assert@1",
+		"@std/streams": "jsr:@std/streams@^1.0.8"
 	}
 }

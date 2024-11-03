@@ -6,6 +6,20 @@
     "configurations": [
         {
             "request": "launch",
+            "name": "ask cloudflare AI",
+            "type": "node",
+            "program": "${workspaceFolder}/ask_cf_ai.ts",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "runtimeExecutable": "deno.EXE",
+            "runtimeArgs": [
+                "run",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229
+        },
+        {
+            "request": "launch",
             "name": "Start SSE Test Server",
             "type": "node",
             "program": "${workspaceFolder}/sse_test.ts",
