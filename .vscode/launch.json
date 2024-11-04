@@ -35,6 +35,26 @@
 				"--allow-all"
 			],
 			"attachSimplePort": 9229
+		},
+		{
+			"request": "launch",
+			"name": "vless",
+			"type": "node",
+			"program": "${workspaceFolder}/vless.ts",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"USER_UUID": "bcaa12d6-1f1f-4f32-84b6-b701de2e1eec",
+			},
+			"runtimeExecutable": "deno.EXE",
+			"runtimeArgs": [
+				"run",
+				// "--watch",
+				"--unstable",
+				"--inspect-wait",
+				"--inspect-brk",
+				"--allow-all"
+			],
+			"attachSimplePort": 9229
 		}
 	]
 }
