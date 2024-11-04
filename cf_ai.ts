@@ -1,25 +1,13 @@
-import { DelimiterStream, TextLineStream } from '@std/streams';
-
 const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_AUTH_TOKEN = Deno.env.get('CLOUDFLARE_AUTH_TOKEN') || '';
-
-function bashPrompt() {
-	alert('Please acknowledge the message.');
-	console.log('The message has been acknowledged.');
-	const shouldProceed = confirm('Do you want to proceed?');
-	console.log('Should proceed?', shouldProceed);
-	const name = prompt('Please enter your name:');
-	console.log('Name:', name);
-	const age = prompt('Please enter your age:', '18');
-	console.log('Age:', age);
-}
 
 export async function cfAI(
 	prompt: string,
 	system: string = 'you are a AI helper.',
 ): Promise<string> {
 	const url = 'https://api.cloudflare.com/client/v4/accounts/' +
-		CLOUDFLARE_ACCOUNT_ID + '/ai/run/@cf/meta/llama-3-8b-instruct';
+		CLOUDFLARE_ACCOUNT_ID +
+		'/ai/run/@cf/meta/llama-3-8b-instruct';
 	const payload = {
 		temperature: 0.01,
 		stream: false,
