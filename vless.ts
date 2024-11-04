@@ -176,93 +176,95 @@ export class Session {
 
 	public start() {
 		const session = this;
-		session.webSocketReadStream.pipeTo(
-			new WritableStream<Uint8Array>({
-				async write(chunk: Uint8Array, controller) {
-					session.trafficIncoming += chunk.byteLength;
-					if (session.isOutboundSockReady) {
-						await session.writeToOutbound(chunk);
-						return;
-					}
-					// parse first chunk to get remoteHost, remotePort, remoteType
-					const {
-						hasError,
-						message,
-						userUUID,
-						remoteProtocol,
-						remotePort,
-						remoteHost,
-						remoteType,
-						version,
-						firstChunkPayload,
-					} = new VlessPayload(chunk);
-					if (hasError) {
-						controller.error(
-							'parse VLESS protocol data failed:' + message,
-						);
-						return;
-					}
-					if (session.authFn && !session.authFn(userUUID)) {
-						controller.error('userUUID is not match:' + userUUID);
-						return;
-					}
-					session.userUuidWithoutDash = userUUID;
-					session.outboundHost = remoteHost;
-					session.outboundPort = remotePort;
-					session.outboundHostType = remoteType;
-					session.vlessVersion = version;
-
-					if (remoteProtocol === 'udp' && remotePort === 53) {
-						session.outboundDns(firstChunkPayload).catch(
-							(error) => {
-								controller.error(
-									'handleDnsOutBound has error:' +
-										error.message,
-								);
-							},
-						);
-					} else if (remoteProtocol === 'tcp' && remotePort === 25) {
-						controller.error(
-							'cloudflare does not support tcp on port 25',
-						);
-					} else if (remoteProtocol === 'tcp') {
-						//do not add await here, because we need to handle tcp out bound in parallel
-						session.outboundTcp(firstChunkPayload).catch(
-							(error) => {
-								controller.error(
-									'handleTcpOutBoundInner has error:' +
-										error.message,
-								);
-							},
-						);
-					} else if (remoteProtocol === 'udp') {
-						try {
-							session.outboundUdp(firstChunkPayload);
-						} catch (error) {
-							controller.error(
-								'handleUdpOutBound has error:' + error.message,
-							);
-						}
-					} else {
-						console.error(
-							'udp not support initial connect' + remoteProtocol +
-								remotePort,
-						);
-						controller.error('udp not support initial connect');
-					}
-				},
-				close() {
-					console.info(`readableWebSocketStream is close`);
-					session.closeOutboundSock();
-				},
-				abort(reason) {
-					console.error(
-						`readableWebSocketStream is abort`,
-						JSON.stringify(reason),
+		const writable = new WritableStream<Uint8Array>({
+			async write(chunk: Uint8Array, controller) {
+				session.trafficIncoming += chunk.byteLength;
+				if (session.isOutboundSockReady) {
+					await session.writeToOutbound(chunk);
+					return;
+				}
+				// parse first chunk to get remoteHost, remotePort, remoteType
+				const {
+					hasError,
+					message,
+					userUUID,
+					remoteProtocol,
+					remotePort,
+					remoteHost,
+					remoteType,
+					version,
+					firstChunkPayload,
+				} = new VlessPayload(chunk);
+				if (hasError) {
+					controller.error(
+						'parse VLESS protocol data failed:' + message,
 					);
-				},
-			}),
-		).catch((err) => {
+					return;
+				}
+				if (session.authFn && !session.authFn(userUUID)) {
+					controller.error('userUUID is not match:' + userUUID);
+					return;
+				}
+				session.userUuidWithoutDash = userUUID;
+				session.outboundHost = remoteHost;
+				session.outboundPort = remotePort;
+				session.outboundHostType = remoteType;
+				session.vlessVersion = version;
+
+				if (remoteProtocol === 'udp' && remotePort === 53) {
+					session.outboundDns(firstChunkPayload).catch(
+						(error) => {
+							controller.error(
+								'handleDnsOutBound has error:' +
+									error.message,
+							);
+						},
+					);
+				} else if (remoteProtocol === 'tcp' && remotePort === 25) {
+					controller.error(
+						'cloudflare does not support tcp on port 25',
+					);
+				} else if (remoteProtocol === 'tcp') {
+					//do not add await here, because we need to handle tcp out bound in parallel
+					//damn it: deno deploy does not support tcp on port 443
+					//This restriction is in place because connecting to port 443 without terminating TLS is frequently used in TLS-over-TLS proxies, which are prohibited on Deno Deploy as per our acceptable use policy.
+					//https://docs.deno.com/deploy/manual/pricing-and-limits
+					session.outboundTcp(firstChunkPayload).catch(
+						(error) => {
+							controller.error(
+								'handleTcpOutBoundInner has error:' +
+									error.message,
+							);
+						},
+					);
+				} else if (remoteProtocol === 'udp') {
+					try {
+						session.outboundUdp(firstChunkPayload);
+					} catch (error) {
+						controller.error(
+							'handleUdpOutBound has error:' + error,
+						);
+					}
+				} else {
+					console.error(
+						'udp not support initial connect' + remoteProtocol +
+							remotePort,
+					);
+					controller.error('udp not support initial connect');
+				}
+			},
+			close() {
+				console.info(`readableWebSocketStream is close`);
+				session.closeOutboundSock();
+			},
+			abort(reason) {
+				console.error(
+					`readableWebSocketStream is abort`,
+					JSON.stringify(reason),
+				);
+			},
+		});
+		session.webSocketReadStream.pipeTo(writable).catch((err) => {
 			console.error('wsReadStream pipeTo error', err);
 		}).finally(() => {
 			//record traffic
