@@ -42,4 +42,7 @@ jobs:
         run: deno lint .
 
       - name: Run tests
+        env:
+          CLOUDFLARE_AUTH_TOKEN: ${{ secrets.CLOUDFLARE_AUTH_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: echo $CLOUDFLARE_AUTH_TOKEN && echo $CLOUDFLARE_ACCOUNT_ID
