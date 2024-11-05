@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assertStringIncludes } from '@std/assert';
 
 import { cfAI } from './cf_ai.ts';
 
