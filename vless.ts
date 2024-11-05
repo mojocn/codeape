@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run -A
+
 function toUUIDWithoutDash(arr: Uint8Array) {
 	return Array.from(arr)
 		.map((byte) => byte.toString(16).padStart(2, '0'))
