@@ -1,6 +1,6 @@
 import { Event, SSE } from './sse.ts';
 
-function handler(_req: Request) {
+function fetch(_req: Request) {
 	const sse = new SSE();
 
 	let timer: number | undefined = undefined;
@@ -29,4 +29,6 @@ function handler(_req: Request) {
 	return sse.response(body);
 }
 
-Deno.serve(handler);
+export default { fetch };
+
+// deno run -A sse_example.ts
