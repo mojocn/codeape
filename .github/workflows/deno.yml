@@ -24,7 +24,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    environment: production
     steps:
       - name: Setup repo
         uses: actions/checkout@v4
@@ -40,3 +40,4 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           echo "$CLOUDFLARE_ACCOUNT_ID"
+          deno test -A cf_ai_test.ts
