@@ -178,9 +178,9 @@ export class Session {
 		this.webSocketReadStream.pipeTo(
 			new WritableStream<Uint8Array>({
 				write: async (chunk: Uint8Array, controller) => {
-					session.trafficIncoming += chunk.byteLength;
-					if (session.isOutboundSockReady) {
-						await session.writeToOutbound(chunk);
+					this.trafficIncoming += chunk.byteLength;
+					if (this.isOutboundSockReady) {
+						await this.writeToOutbound(chunk);
 						return;
 					}
 					// parse first chunk to get remoteHost, remotePort, remoteType
@@ -201,22 +201,22 @@ export class Session {
 						);
 						return;
 					}
-					if (session.authFn && !session.authFn(userUUID)) {
+					if (this.authFn && !this.authFn(userUUID)) {
 						controller.error('userUUID is not match:' + userUUID);
 						return;
 					}
-					session.userUuidWithoutDash = userUUID;
-					session.outboundHost = remoteHost;
-					session.outboundPort = remotePort;
-					session.outboundHostType = remoteType;
-					session.vlessVersion = version;
+					this.userUuidWithoutDash = userUUID;
+					this.outboundHost = remoteHost;
+					this.outboundPort = remotePort;
+					this.outboundHostType = remoteType;
+					this.vlessVersion = version;
 
 					if (remoteProtocol === 'udp' && remotePort === 53) {
-						session.outboundDns(firstChunkPayload).catch(
+						this.outboundDns(firstChunkPayload).catch(
 							(error) => {
 								controller.error(
 									'handleDnsOutBound has error:' +
-										error.message,
+									error.message,
 								);
 							},
 						);
@@ -226,26 +226,28 @@ export class Session {
 						);
 					} else if (remoteProtocol === 'tcp') {
 						//do not add await here, because we need to handle tcp out bound in parallel
-						session.outboundTcp(firstChunkPayload).catch(
+						//TLS termination is required for outgoing connections to port 443 (the port used for HTTPS). Using Deno.connect to connect to these ports is prohibited. 
+						//If you need to establish a TLS connection to port 443, please use Deno.connectTls instead. fetch is not impacted by this restriction.
+						this.outboundTcp(firstChunkPayload).catch(
 							(error) => {
 								controller.error(
 									'handleTcpOutBoundInner has error:' +
-										error.message,
+									error.message,
 								);
 							},
 						);
 					} else if (remoteProtocol === 'udp') {
 						try {
-							session.outboundUdp(firstChunkPayload);
+							this.outboundUdp(firstChunkPayload);
 						} catch (error) {
 							controller.error(
-								'handleUdpOutBound has error:' + error.message,
+								'handleUdpOutBound has error:' + error,
 							);
 						}
 					} else {
 						console.error(
 							'udp not support initial connect' + remoteProtocol +
-								remotePort,
+							remotePort,
 						);
 						controller.error('udp not support initial connect');
 					}
@@ -351,7 +353,7 @@ export class Session {
 		}
 		let isRemoteSocketHasIncomingData = false;
 		const webSocketWriter = new WritableStream({
-			start: () => {},
+			start: () => { },
 			write: async (
 				chunk: Uint8Array,
 				controller: WritableStreamDefaultController,
@@ -359,11 +361,8 @@ export class Session {
 				try {
 					await this.writeToWebsocket(chunk);
 					isRemoteSocketHasIncomingData = true;
-				} catch (error: unknown) {
-					controller.error(
-						'webSocketWriter!.writable has error',
-						error,
-					);
+				} catch (error) {
+					controller.error('webSocketWriter!.writable has error' + error);
 				}
 			},
 			close: () => {
@@ -500,9 +499,6 @@ export class Session {
 }
 
 function vlessProxy(request: Request): Response {
-	console.info(
-		'------------------------------------------------------------------------------------------------------------------------------------------',
-	);
 	const { socket, response } = Deno.upgradeWebSocket(request);
 	const envUserUUID = Deno.env.get('USER_UUID') || '';
 
