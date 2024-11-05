@@ -216,7 +216,7 @@ export class Session {
 							(error) => {
 								controller.error(
 									'handleDnsOutBound has error:' +
-									error.message,
+										error.message,
 								);
 							},
 						);
@@ -226,13 +226,13 @@ export class Session {
 						);
 					} else if (remoteProtocol === 'tcp') {
 						//do not add await here, because we need to handle tcp out bound in parallel
-						//TLS termination is required for outgoing connections to port 443 (the port used for HTTPS). Using Deno.connect to connect to these ports is prohibited. 
+						//TLS termination is required for outgoing connections to port 443 (the port used for HTTPS). Using Deno.connect to connect to these ports is prohibited.
 						//If you need to establish a TLS connection to port 443, please use Deno.connectTls instead. fetch is not impacted by this restriction.
 						this.outboundTcp(firstChunkPayload).catch(
 							(error) => {
 								controller.error(
 									'handleTcpOutBoundInner has error:' +
-									error.message,
+										error.message,
 								);
 							},
 						);
@@ -247,7 +247,7 @@ export class Session {
 					} else {
 						console.error(
 							'udp not support initial connect' + remoteProtocol +
-							remotePort,
+								remotePort,
 						);
 						controller.error('udp not support initial connect');
 					}
@@ -306,33 +306,31 @@ export class Session {
 	}
 
 	private get webSocketReadStream(): ReadableStream<Uint8Array> {
-		const { webSocket, closeWebSocket } = this;
 		return new ReadableStream({
-			start(controller) {
-				webSocket.onopen = (event: Event) => {
+			start: (controller) => {
+				this.webSocket.onopen = (event: Event) => {
 					console.info('webSocketServer is open', event);
 				};
-				webSocket.onmessage = (event: MessageEvent) => {
+				this.webSocket.onmessage = (event: MessageEvent) => {
 					controller.enqueue(new Uint8Array(event.data)); //event.data is ArrayBuffer
 				};
-				webSocket.onclose = (event: CloseEvent) => {
+				this.webSocket.onclose = (event: CloseEvent) => {
 					console.info(
 						'webSocketServer is close',
 						event.code,
 						event.reason,
 					);
-					controller.close();
+					this.closeOutboundSock;
 				};
-				webSocket.onerror = (event: Event) => {
+				this.webSocket.onerror = (event: Event) => {
 					console.error('webSocketServer has error', event);
 					controller.error(event);
 				};
 			},
-			pull(controller) {
-			},
-			cancel(reason) {
+			pull: (controller) => {},
+			cancel: (reason) => {
 				console.error(`ReadableStream was canceled, due to ${reason}`);
-				closeWebSocket();
+				this.closeWebSocket();
 			},
 		});
 	}
@@ -353,7 +351,7 @@ export class Session {
 		}
 		let isRemoteSocketHasIncomingData = false;
 		const webSocketWriter = new WritableStream({
-			start: () => { },
+			start: () => {},
 			write: async (
 				chunk: Uint8Array,
 				controller: WritableStreamDefaultController,
@@ -362,7 +360,9 @@ export class Session {
 					await this.writeToWebsocket(chunk);
 					isRemoteSocketHasIncomingData = true;
 				} catch (error) {
-					controller.error('webSocketWriter!.writable has error' + error);
+					controller.error(
+						'webSocketWriter!.writable has error' + error,
+					);
 				}
 			},
 			close: () => {
