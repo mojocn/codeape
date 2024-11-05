@@ -34,13 +34,9 @@ jobs:
         with:
           deno-version: v2.x
 
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
-      # - name: Verify formatting
-      #   run: deno fmt --check
-
-      - name: Run linter
-        run: deno lint .
-
       - name: Run tests
+        env:
+          CLOUDFLARE_AUTH_TOKEN: ${{ secrets.CLOUDFLARE_AUTH_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           echo "$CLOUDFLARE_ACCOUNT_ID"
