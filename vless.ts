@@ -228,7 +228,7 @@ export class Session {
 						);
 					} else if (remoteProtocol === 'tcp') {
 						//do not add await here, because we need to handle tcp out bound in parallel
-						//TLS termination is required for outgoing connections to port 443 (the port used for HTTPS). Using Deno.connect to connect to these ports is prohibited.
+						// Deno Deploy: TLS termination is required for outgoing connections to port 443 (the port used for HTTPS). Using Deno.connect to connect to these ports is prohibited.
 						//If you need to establish a TLS connection to port 443, please use Deno.connectTls instead. fetch is not impacted by this restriction.
 						this.outboundTcp(firstChunkPayload).catch(
 							(error) => {

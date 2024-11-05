@@ -1,4 +1,7 @@
 {
+	"name":"@mojocn/codeape",
+	"version":"0.0.1",
+	"exports":"./mod.ts",
 	"tasks": {
 		"dev": "deno run --watch main.ts",
 		"lint": "deno lint"
