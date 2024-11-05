@@ -31,4 +31,4 @@ function fetch(_req: Request) {
 
 export default { fetch };
 
-// deno run -A sse_example.ts
+// deno serve -A sse_example.ts

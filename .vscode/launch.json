@@ -20,14 +20,14 @@
 		},
 		{
 			"request": "launch",
-			"name": "Start SSE Test Server",
+			"name": "Start SSE Example Server",
 			"type": "node",
-			"program": "${workspaceFolder}/sse_test.ts",
+			"program": "${workspaceFolder}/sse_example.ts",
 			"cwd": "${workspaceFolder}",
 			"env": {},
 			"runtimeExecutable": "deno.EXE",
 			"runtimeArgs": [
-				"run",
+				"serve",
 				"--watch",
 				"--unstable",
 				"--inspect-wait",
@@ -38,16 +38,16 @@
 		},
 		{
 			"request": "launch",
-			"name": "vless",
+			"name": "vless example server",
 			"type": "node",
-			"program": "${workspaceFolder}/vless.ts",
+			"program": "${workspaceFolder}/vless_example.ts",
 			"cwd": "${workspaceFolder}",
 			"env": {
-				"USER_UUID": "bcaa12d6-1f1f-4f32-84b6-b701de2e1eec",
+				"USER_UUID": "bcaa12d6-1f1f-4f32-84b6-b701de2e1eec"
 			},
 			"runtimeExecutable": "deno.EXE",
 			"runtimeArgs": [
-				"run",
+				"serve",
 				// "--watch",
 				"--unstable",
 				"--inspect-wait",

@@ -1,4 +1,4 @@
-export const toMs = (duration: number):number => Math.floor(duration / 10_000);
+export const toMs = (duration: number): number => Math.floor(duration / 10_000);
 interface WordBoundary {
 	Type: 'WordBoundary';
 	Data: {
@@ -112,7 +112,7 @@ class TtsResult {
 		this.audioParts = [];
 		this.marks = [];
 	}
-	get mp3Blob():Blob {
+	get mp3Blob(): Blob {
 		return new Blob(this.audioParts, { type: 'audio/mpeg' });
 	}
 	async writeToFile(path?: string) {

@@ -1,8 +1,7 @@
-import { assertExists ,} from '@std/assert';
+import { assertExists } from '@std/assert';
 import { EdgeTts } from './edgetts.ts';
 
-const txt =
-	`Deno is awesome!`;
+const txt = `Deno is awesome!`;
 
 Deno.test({
 	name: 'test edge TTS speak',
@@ -29,5 +28,3 @@ Deno.test('test edge TTS voice list', async () => {
 	const voices = await tts.voices();
 	assertExists(voices);
 });
-
-

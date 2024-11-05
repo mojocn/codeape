@@ -1,7 +1,17 @@
 {
-	"name":"@mojocn/codeape",
-	"version":"0.0.1",
-	"exports":"./mod.ts",
+	"name": "@mojocn/codeape",
+	"version": "0.0.1",
+	"exports": "./mod.ts",
+	"publish": {
+		"include": [
+			"LICENSE",
+			"README.md",
+			"src/**/*.ts"
+		],
+		"exclude": [
+			"src/tests"
+		]
+	},
 	"tasks": {
 		"dev": "deno run --watch main.ts",
 		"lint": "deno lint"

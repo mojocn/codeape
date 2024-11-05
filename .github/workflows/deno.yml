@@ -9,35 +9,34 @@
 name: Deno
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    push:
+        branches: ['main']
+    pull_request:
+        branches: ['main']
 
 env:
-  CLOUDFLARE_AUTH_TOKEN: ${{ secrets.CLOUDFLARE_AUTH_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    AI_XXX: hello world
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Setup repo
-        uses: actions/checkout@v4
+    test:
+        runs-on: ubuntu-latest
+        environment: production # must same with repo -> settings -> environments
+        steps:
+            - name: Setup repo
+              uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
+            - name: Setup Deno
+              uses: denoland/setup-deno@v2
+              with:
+                  deno-version: v2.x
 
-      - name: Run tests
-        env:
-          CLOUDFLARE_AUTH_TOKEN: ${{ secrets.CLOUDFLARE_AUTH_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "$CLOUDFLARE_ACCOUNT_ID"
-          deno test -A cf_ai_test.ts
+            - name: Run tests
+              env:
+                  CLOUDFLARE_AUTH_TOKEN: ${{ secrets.CLOUDFLARE_AUTH_TOKEN }}
+                  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+              run: |
+                  echo "$CLOUDFLARE_ACCOUNT_ID"
+                  deno test -A cf_ai_test.ts
