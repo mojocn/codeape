@@ -2,9 +2,9 @@
 [![JSR Score](https://jsr.io/badges/@mojocn/code/score)](https://jsr.io/@mojocn/codeape)
 
 
-## Videos
+## Youtube Videos Tutorial
 
-* [Use Free Edge Text to Speech API with Deno.js](https://www.youtube.com/watch?v=uATgw1KVj_4)
+1. [Use Free Edge Text to Speech API with Deno.js](https://www.youtube.com/watch?v=uATgw1KVj_4)
 
 
 
